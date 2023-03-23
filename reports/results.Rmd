@@ -1,0 +1,85 @@
+---
+title: "feasible-cache viz"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+
+```{r}
+
+targets::tar_load("all", store = here::here("_targets"))
+
+```
+
+```{r}
+
+head(all)
+
+unique(all$richness)
+unique(all$abundance)
+```
+
+```{r, fig.dim = c(20,20)}
+# 
+# ggplot(all, aes(hill1)) + 
+#   geom_density() +
+#   facet_wrap(vars(richness, abundance), scales = 'free_y')
+# 
+# 
+# ggplot(all, aes(hill1)) + 
+#   geom_histogram() +
+#   facet_wrap(vars(richness, abundance), scales = 'free_y')
+
+ggplot(filter(all, richness %in% seq(0, 200, by = 5)), aes(hill1, group = as.factor(abundance), color = as.factor(abundance))) +
+  geom_density() +
+  facet_wrap(vars(richness)) +
+  theme(legend.position = "none")
+
+```
+
+
+```{r all quantiles}
+
+all_quantiles <- all %>%
+  group_by(richness, abundance) %>%
+  summarize(mean_hill1 = mean(hill1),
+            median_hill1 = median(hill1),
+            p5_hill1 = quantile(hill1, probs = .05),
+            p95_hill1 = quantile(hill1, probs = .95))
+
+```
+```{r}
+
+ggplot(all_quantiles, aes(richness, abundance, color = median_hill1)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_viridis_c()
+
+
+
+ggplot(all_quantiles, aes(richness, abundance, color = p5_hill1)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_viridis_c()
+
+
+ggplot(all_quantiles, aes(richness, abundance, color = p95_hill1)) +
+  geom_point() +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_viridis_c()
+
+```
+```{r, eval = F}
+
+write.csv(all, here::here("reports", "all_tiny.csv"), row.names = F)
+
+```
