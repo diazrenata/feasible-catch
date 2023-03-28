@@ -1,0 +1,39 @@
+---
+title: "playing with keras"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(reticulate)
+use_condaenv("/Users/renatadiaz/Library/r-miniconda-arm64/envs/r-reticulate")
+
+library(kerasR)
+library(ggplot2)
+
+boston <- load_boston_housing()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
