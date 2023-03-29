@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 ptables/masterp_tall.Rds
+^.DS_Store
+*.DS_Store
