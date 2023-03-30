@@ -19,7 +19,7 @@ targets::tar_load("all", store = here::here("_targets"))
 ```
 
 ```{r}
-set.seed(1989)
+#set.seed(1989)
 all_combos <- all %>%
   select(richness, abundance) %>%
   distinct()
