@@ -27,23 +27,22 @@ tar_source()
 # source("other_functions.R") # Source other scripts as needed. # nolint
 
 
-pars <- read.csv(here::here("easy_pars.csv"))
+pars <- read.csv(here::here("dense_pars.csv"))
 
-pars <- filter(pars, S < 200, S > 2)
 
-js <- pars$J
-vs <- pars$v
+ss <- pars$richness
+ns <- pars$abundance
 
 p_table <- readRDS(here::here("ptables", "masterp_tall.Rds"))
 
-vals <- data.frame(js = js, vs = vs)
+vals <- data.frame(ss = ss, ns = ns)
 
 #vals <- vals[1:5, ]
 
 # Replace the target list below with your own:
 
 t1 <- tar_map(vals,
-                targets::tar_target(analysis, full_workflow(J = js, v = vs, p_table = p_table)))
+                targets::tar_target(analysis, full_workflow_sn(s = ss, n = ns, p_table = p_table)))
 
 t2 <- tarchetypes::tar_combine(
   all,
