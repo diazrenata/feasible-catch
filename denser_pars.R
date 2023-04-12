@@ -38,7 +38,7 @@ new_pars <- new_pars %>%
 ggplot(easy_pars, aes(S, J)) + 
   geom_point() +
   geom_point(data = new_pars, aes(richness, abundance), color = "green") +
-  geom_ribbon(aes(x = seq(0, 200, length.out = 517), ymin = 0, ymax = 40700), inherit.aes = F, alpha = .1, fill = "pink")
+  geom_ribbon(aes(x = seq(0, 200, length.out = 517), ymin = 0, ymax = 20001), inherit.aes = F, alpha = .1, fill = "pink")
 
 write.csv(new_pars, "dense_pars.csv", row.names = F)
 
