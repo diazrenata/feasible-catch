@@ -40,5 +40,36 @@ ggplot(easy_pars, aes(S, J)) +
   geom_point(data = new_pars, aes(richness, abundance), color = "green") +
   geom_ribbon(aes(x = seq(0, 200, length.out = 517), ymin = 0, ymax = 20001), inherit.aes = F, alpha = .1, fill = "pink")
 
+# write.csv(new_pars, "dense_pars.csv", row.names = F)
+
+
+# appending more samples
+
+
+more_random_richness = sample.int(200, size = 1000, replace = TRUE)
+
+more_random_abundance = sample.int(20000, size = 1000, replace = TRUE)
+
+more_new_pars <- data.frame(
+  richness = more_random_richness,
+  abundance = more_random_abundance
+)
+
+new_pars <- bind_rows(new_pars, more_new_pars)  %>%
+  filter(richness + 1 < abundance,
+         richness > 2 ) %>%
+  distinct()
+
+
+
+ggplot(easy_pars, aes(S, J)) + 
+  geom_point() +
+  geom_point(data = new_pars, aes(richness, abundance), color = "green") +
+  geom_point(data = more_new_pars, aes(richness, abundance), color = "purple") +
+  geom_ribbon(aes(x = seq(0, 200, length.out = 517), ymin = 0, ymax = 20001), inherit.aes = F, alpha = .1, fill = "pink")
+
+1500 / (200 * 20000)
+
 write.csv(new_pars, "dense_pars.csv", row.names = F)
+
 
