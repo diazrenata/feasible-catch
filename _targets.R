@@ -37,7 +37,7 @@ p_table <- readRDS(here::here("ptables", "masterp_tall.Rds"))
 
 vals <- data.frame(ss = ss, ns = ns)
 
-#vals <- vals[1:5, ]
+vals <- vals[1:5, ]
 
 # Replace the target list below with your own:
 
