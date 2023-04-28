@@ -11,3 +11,5 @@ sample_summaries <- all %>%
   ungroup()
 
 write.csv(sample_summaries, "1500_samples.csv", row.names = F)
+
+write.csv(all, "1500_samples_raw.csv", row.names = F)
