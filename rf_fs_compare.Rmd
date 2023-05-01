@@ -1,0 +1,52 @@
+---
+title: "Random forest - FS comparisons"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.dim =c(20,20))
+library(ggplot2)
+library(dplyr)
+theme_set(theme_bw())
+```
+```{r import dat}
+set.seed(1988)
+
+rf_fs <- read.csv(here::here("mod_compare", "rf_and_fs_samples.csv"))
+
+head(rf_fs)
+
+short_rf_fs_combos <- rf_fs %>%
+  select(richness, abundance) %>%
+  distinct()
+
+short_rf_fs_combos <- short_rf_fs_combos[ sample(nrow(short_rf_fs_combos), 50, F), ]
+short_rf_fs_combos <- short_rf_fs_combos %>%
+  left_join(rf_fs, by = c("richness", "abundance"))
+
+```
+
+```{r}
+
+full_lineplot <- ggplot(short_rf_fs_combos, aes(hill1, sampled_hill)) +
+  geom_point() +
+  geom_line(aes(y = hill1), color = "orange") +
+  facet_wrap(vars(richness, abundance), scales = "free")
+full_lineplot
+
+```
+
+
+```{r}
+short_rf_fs_combos_long <- short_rf_fs_combos %>%
+  select(-X) %>%
+  tidyr::pivot_longer(-c(richness, abundance), names_to = "src", values_to = 'h')
+
+
+full_distplot <- ggplot(short_rf_fs_combos, aes(hill1)) +
+  geom_histogram(alpha = .6) +
+  geom_histogram(aes(x = sampled_hill), alpha = .2, color = "orange", fill = "orange") + 
+  facet_wrap(vars(richness, abundance), scales = "free")
+
+full_distplot
+```
