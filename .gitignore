@@ -5,3 +5,4 @@
 ptables/masterp_tall.Rds
 ^.DS_Store
 *.DS_Store
+1500_samples_raw.csv
