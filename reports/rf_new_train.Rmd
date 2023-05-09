@@ -1,0 +1,88 @@
+---
+title: "random forest"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+library(randomForest)
+```
+
+
+```{r}
+
+targets::tar_load("all", store = here::here("_targets"))
+
+```
+
+```{r}
+set.seed(1989)
+all_combos <- all %>%
+  group_by(richness, abundance) %>%
+  summarize(mean_h1 = mean(hill1),
+            sd_h1 = sd(hill1),
+            n_h1 = length(unique(hill1))) %>%
+  ungroup() %>%
+  filter(n_h1 == 1000)
+
+all_training_rows <- sample.int(nrow(all_combos), size = round(nrow(all_combos)/2), replace = F)
+
+all_training <- all_combos[all_training_rows, ]
+all_test <- all_combos[-all_training_rows, ]
+
+
+
+```
+
+```{r}
+
+ggplot(all_training, aes(richness, abundance, color = mean_h1)) +
+  geom_point()
+
+```
+
+
+```{r}
+
+all.rf <- randomForest(mean_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$mean_h1)
+
+all_test$rf.predicted <- all.rf$test$predicted
+
+
+
+ggplot(all_test, aes(mean_h1, rf.predicted))+
+  geom_point() +
+  geom_line(aes(y = mean_h1))
+
+```
+
+
+```{r}
+
+allsd.rf <- randomForest(sd_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$sd_h1)
+
+all_test$rf.predicted_sd <- allsd.rf$test$predicted
+
+
+
+ggplot(all_test, aes(sd_h1, rf.predicted_sd))+
+  geom_point() +
+  geom_line(aes(y = sd_h1))
+
+```
+
+```{r}
+
+all.lm <- lm(mean_h1 ~ richness + abundance, data = all_training)
+
+all_test$lm.predicted <- predict(all.lm, newdata = all_test[, c("richness", "abundance")])
+
+ggplot(all_test, aes(mean_h1, lm.predicted))+
+  geom_point() 
+
+summary(all.lm)
+
+```
