@@ -47,7 +47,7 @@ ggplot(all_training, aes(richness, abundance, color = mean_h1)) +
 
 ```{r}
 
-all.rf <- randomForest(mean_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$mean_h1)
+all.rf <- randomForest(mean_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$mean_h1, keep.forest =T)
 
 all_test$rf.predicted <- all.rf$test$predicted
 
@@ -62,7 +62,7 @@ ggplot(all_test, aes(mean_h1, rf.predicted))+
 
 ```{r}
 
-allsd.rf <- randomForest(sd_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$sd_h1)
+allsd.rf <- randomForest(sd_h1 ~ richness + abundance, data = all_training, xtest = select(all_test, richness, abundance), ytest = all_test$sd_h1, keep.forest =T)
 
 all_test$rf.predicted_sd <- allsd.rf$test$predicted
 
@@ -84,5 +84,49 @@ ggplot(all_test, aes(mean_h1, lm.predicted))+
   geom_point() 
 
 summary(all.lm)
+
+```
+
+
+```{r}
+
+rf_fs <- read.csv(here::here("mod_compare", "rf_and_fs_samples.csv"))
+
+rf_fs_combos <- rf_fs %>%
+  select(richness, abundance) %>%
+  distinct() 
+
+rf_fs_pars <- rf_fs_combos %>%
+  mutate(r_rf_mean = predict(all.rf,  rf_fs_combos[, c('richness', 'abundance')], type = 'response'),
+         r_rf_sd = predict(allsd.rf,  rf_fs_combos[, c('richness', 'abundance')], type = 'response')) %>%
+  left_join(all_combos)
+
+rf_sims <- list()
+
+for (i in 1:nrow(rf_fs_pars)) {
+  
+  these_sims <- data.frame(
+    richness = rf_fs_pars$richness[i],
+    abundance = rf_fs_pars$abundance[i],
+    r_sampled_hill1 = sort(rnorm(1000, mean = rf_fs_pars$r_rf_mean[i], sd = rf_fs_pars$r_rf_sd[i])
+  ))
+  
+  rf_sims[[i]] <- these_sims
+  
+}
+
+
+rf_sims <- bind_rows(rf_sims)
+
+```
+
+
+```{r}
+
+rf_sims <- rf_sims %>%
+  mutate(X = row_number() - 1) %>%
+  select(-X)
+
+write.csv(rf_sims, here::here("rf_from_r_sims.csv"), row.names = F)
 
 ```
